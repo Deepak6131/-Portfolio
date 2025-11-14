@@ -1,49 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Link} from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/solid';
 
 const Navbar = ({ darkMode, setDarkMode }) => {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  // const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
+      // 1️⃣ Change navbar style when scrolled
       if (window.scrollY > 50) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
 
-      // Determine active section based on scroll position
-      const sections = ['home', 'about', 'skills', 'education', 'certification', 'projects', 'contact'];
-      const scrollPosition = window.scrollY + 100;
+      // 2️⃣ Detect which section is currently visible
+      const sections = [
+        'home',
+        'about',
+        'skills',
+        'education',
+        'certification',
+        'projects',
+        'contact',
+      ];
 
-      for (const section of sections) {
+      const scrollPosition = window.scrollY + 150; // offset for smooth highlight
+      let currentActiveSection = 'home';
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
         const element = document.getElementById(section);
         if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section);
+          const { offsetTop } = element;
+          if (scrollPosition >= offsetTop) {
+            currentActiveSection = section;
             break;
           }
         }
       }
+
+      setActiveSection(currentActiveSection);
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // run once on mount
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '/#home' },
-    { name: 'About', href: '/#about' },
-    { name: 'Skills', href: '/#skills' },
-    { name: 'Education', href: '/#education' },
-    { name: 'Certification', href: '/#certification' },
-    { name: 'Projects', href: '/#projects' },
-    { name: 'Contact', href: '/#contact' },
+    { name: 'Home', href: '#home' },
+    { name: 'About', href: '#about' },
+    { name: 'Skills', href: '#skills' },
+    { name: 'Education', href: '#education' },
+    { name: 'Certification', href: '#certification' },
+    { name: 'Projects', href: '#projects' },
+    { name: 'Contact', href: '#contact' },
   ];
 
   return (
@@ -54,29 +67,38 @@ const Navbar = ({ darkMode, setDarkMode }) => {
       transition={{ duration: 0.5 }}
     >
       <div className="container navbar-container">
-        <Link to="/" className="navbar-logo">
+        {/* Logo */}
+        <a href="#home" className="navbar-logo">
           Deepak<span>.Portfolio</span>
-        </Link>
+        </a>
 
+        {/* Navigation Menu */}
         <ul className="navbar-menu">
           {navLinks.map((link) => (
             <li key={link.name} className="navbar-item">
-              <Link
-                to={link.href}
-                className={`navbar-link ${activeSection === link.href.split('#')[1] ? 'active' : ''}`}
+              <a
+                href={link.href}
+                className={`navbar-link ${
+                  activeSection === link.href.split('#')[1] ? 'active' : ''
+                }`}
               >
                 {link.name}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
 
+        {/* Dark Mode Toggle */}
         <button
           onClick={() => setDarkMode(!darkMode)}
           className="theme-toggle"
           aria-label="Toggle dark mode"
         >
-          {darkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+          {darkMode ? (
+            <SunIcon className="h-5 w-5" />
+          ) : (
+            <MoonIcon className="h-5 w-5" />
+          )}
         </button>
       </div>
     </motion.nav>
